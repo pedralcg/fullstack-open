@@ -7,6 +7,7 @@ Este repositorio contiene mis soluciones a los ejercicios y los proyectos desarr
 Full Stack Open es un curso intensivo que cubre el desarrollo de aplicaciones web modernas basadas en JavaScript, explorando tanto el frontend (con **React**) como el backend (con **Node.js** y **Express**), bases de datos (**MongoDB**), testing, GraphQL, TypeScript, y más.
 
 * [Enlace al curso Full Stack Open (en español)](https://fullstackopen.com/es/)
+* [Sistema de envío ejercicios](https://studies.cs.helsinki.fi/stats/courses/fullstackopen)
 
 ## Estructura del Repositorio
 
