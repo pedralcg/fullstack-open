@@ -7,23 +7,34 @@ const Header = (props) => {
   )
 }
 
-
-const Content = (props) => {
-  //console.log(props)
+// Define este nuevo componente en tu archivo App.jsx
+const Part = (props) => {
+  // console.log('Props recibidas en Part:', props);
   return (
     <div>
+      {/* Recibe el nombre y el número de ejercicios como props */}
       <p>
-        {props.part1} {props.exercises1}
-      </p>
-      <p>
-        {props.part2} {props.exercises2}
-      </p>
-      <p>
-        {props.part3} {props.exercises3}
+        {/* Recibirá una prop llamada 'name' y otra llamada 'exercises' */}
+        {props.name} {props.exercises}
       </p>
     </div>
-  )
-}
+  );
+};
+
+
+const Content = (props) => {
+  // console.log('Props recibidas en Content:', props);
+  return (
+    <div>
+      {/* Renderiza el primer componente Part, pasándole la data de la primera parte */}
+      <Part name={props.part1} exercises={props.exercises1} />
+      {/* Renderiza el segundo componente Part, pasándole la data de la segunda parte */}
+      <Part name={props.part2} exercises={props.exercises2} />
+      {/* Renderiza el tercer componente Part, pasándole la data de la tercera parte */}
+      <Part name={props.part3} exercises={props.exercises3} />
+    </div>
+  );
+};
 
 const Total = (props) => {
   //console.log(props)
