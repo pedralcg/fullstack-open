@@ -41,19 +41,12 @@ Aquí puedes listar las partes que has completado. ¡Empieza con la Parte 0!
 - [ ] Parte 4: Pruebas de servidores Express y administración de usuarios
 - [ ] Parte 5: Pruebas de aplicaciones React
 
-## Cómo Clonar y Ejecutar (Para futuras partes con código ejecutable)
+## Cómo Clonar el repositorio:  
 
+```bash
+git clone https://github.com/pedralcg/fullstack-open.git
+```
 
-1.  Clona el repositorio:
-    ```bash
-    git clone https://github.com/pedralcg/fullstack-open.git
-    ```
-2.  Navega a la carpeta de la parte que te interese (ej. `cd fullstack-open/parte1`).
-3.  Instala las dependencias (dentro de la carpeta de la parte):
-    ```bash
-    npm install
-    ```
-4.  Sigue las instrucciones específicas de cada ejercicio o proyecto dentro de su respectiva carpeta para ejecutar el código (ej. `npm start`).
 
 ## Contacto
 
