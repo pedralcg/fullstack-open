@@ -59,30 +59,33 @@ const Total = (props) => {
 
 // Componente App: Contiene toda la data y renderiza los componentes principales.
 const App = () => {
-  const course = 'Half Stack application development'
-  // Data organizada en un array de objetos
-  const parts = [
-    {
-      name: 'Fundamentals of React',
-      exercises: 10
-    },
-    {
-      name: 'Using props to pass data',
-      exercises: 7
-    },
-    {
-      name: 'State of a component',
-      exercises: 14
-    }
-  ]
+  // Data organizada en un único objeto 'course'
+  const course = {
+    name: 'Half Stack application development',
+    parts: [
+      {
+        name: 'Fundamentals of React',
+        exercises: 10
+      },
+      {
+        name: 'Using props to pass data',
+        exercises: 7
+      },
+      {
+        name: 'State of a component',
+        exercises: 14
+      }
+    ]
+  }
   
   return (
     <div>
-      <Header course={course}/>
-      {/* Pasa el array 'parts' completo a Content */}
-      <Content parts={parts} />
-      {/* **Pasa el array 'parts' completo a Total** */}
-      <Total parts={parts} />
+      {/* Pasa el nombre del curso (una propiedad del objeto course) al Header */}
+      <Header course={course.name} />
+      {/* Pasa el array de partes (una propiedad del objeto course) a Content */}
+      <Content parts={course.parts} />
+      {/* Pasa el array de partes (una propiedad del objeto course) a Total */}
+      <Total parts={course.parts} />
     </div>
   )
 }
