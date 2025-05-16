@@ -6,6 +6,30 @@ const Button = ({ handleClick, text }) => (
   </button>
 )
 
+const Statistics = (props) => {
+  // Recibe los valores de good, neutral y bad como props
+  const good = props.good;
+  const neutral = props.neutral;
+  const bad = props.bad;
+  // Cálculo de los valores derivados usando las props
+  const total = good + neutral + bad
+  const average = total === 0 ? 0 : (good * 1 + neutral * 0 + bad * -1) / total
+  const percentage = total === 0 ? 0 : (good / total) * 100
+  // Retorna el JSX de estadísticas
+  return (
+    <div>
+      <h1>Statistics</h1>
+      <li>Good: {good}</li> 
+      <li>Neutral: {neutral}</li>
+      <li>Bad: {bad}</li>
+      <li>Total: {total}</li>
+      <li>Average: {average}</li>
+      <li>Positive percentage: {percentage} %</li>
+    </div>
+  );
+}
+
+
 const App = () => {
   // guarda los clics de cada botón en su propio estado
   const [good, setGood] = useState(0)
@@ -24,16 +48,6 @@ const App = () => {
     setBad(bad + 1)
   }
 
-  const total = good + neutral + bad
-
-  const average = total === 0
-    ? 0 
-    : (good * 1 + neutral * 0 + bad * -1) / total
-
-  const percentage = total === 0
-    ? 0
-    : (good / total) * 100
-
 
   return (
     <div>
@@ -41,13 +55,7 @@ const App = () => {
       <Button handleClick={handleGoodClick} text='Good' />
       <Button handleClick={handleNeutralClick} text='Neutral' />
       <Button handleClick={handleBadClick} text='Bad' />
-    <h1>Statics</h1>
-    <li>Good: {good}</li>
-    <li>Neutral: {neutral}</li>
-    <li>Bad: {bad}</li>
-    <li>All: {total}</li>
-    <li>Average: {average}</li>
-    <li>Positive percentage: {percentage}%</li>
+    <Statistics good={good} neutral={neutral} bad={bad} />
     </div>
   )
 }
