@@ -48,6 +48,20 @@ const App = () => {
     setBad(bad + 1)
   }
 
+  // Total de comentarios en App para la renderización condicional
+  const totalFeedback = good + neutral + bad;
+
+  // Renderización condicional de las estadísticas
+  const statisticsSection = totalFeedback === 0 ? (
+    // Si no hay feedback, muestra este mensaje
+    <div>
+      <h1>Statistics</h1>
+      <p>No feedback given.</p>
+    </div>
+  ) : (
+    // Si hay feedback, renderiza el componente Statistics
+    <Statistics good={good} neutral={neutral} bad={bad} />
+  )
 
   return (
     <div>
@@ -55,7 +69,7 @@ const App = () => {
       <Button handleClick={handleGoodClick} text='Good' />
       <Button handleClick={handleNeutralClick} text='Neutral' />
       <Button handleClick={handleBadClick} text='Bad' />
-    <Statistics good={good} neutral={neutral} bad={bad} />
+    {statisticsSection}
     </div>
   )
 }
