@@ -8,9 +8,16 @@ const Button = ({ handleClick, text }) => (
 
 const StatisticLine = (props) => {
   return (
-    <li>{props.text}: {props.value}</li>
-    // <p>{props.text}: {props.value}</p>
-  )
+    /**Ahora retorna una fila de tabla (<tr>) con dos celdas de datos (<td>)
+     * ¡Importante! Eliminar el espacio en blanco.
+     */
+    <tr>
+      {/* Celda para el texto/etiqueta */}
+      <td>{props.text}</td>
+      {/* Celda para el valor */}
+      <td>{props.value}</td>
+    </tr>
+  );
 }
 
 const Statistics = (props) => {
@@ -26,13 +33,21 @@ const Statistics = (props) => {
   return (
     <div>
       <h1>Statistics</h1>
-      {/* Usar el nuevo componente StatisticLine para cada estadística */}
-      <StatisticLine text="Good" value={good} />
-      <StatisticLine text="Neutral" value={neutral} />
-      <StatisticLine text="Bad" value={bad} />
-      <StatisticLine text="Total" value={total} />
-      <StatisticLine text="Average" value={average} />
-      <StatisticLine text="Positive percentage" value={`${percentage.toFixed(1)} %`} /> {/* Pasa el valor formateado */}
+      {/* Comienzo estructura de la tabla HTML */}
+      <table>
+        <tbody>
+          {/* ¡Importante! Eliminar el espacio en blanco (saltos de línea e indentación) 
+          entre las etiquetas StatisticLine. El error se encontraba en el espacio de 
+          los comentarios en la misma línea*/}
+          <StatisticLine text="Good" value={good} />
+          <StatisticLine text="Neutral" value={neutral} />
+          <StatisticLine text="Bad" value={bad} />
+          <StatisticLine text="Total" value={total} />
+          <StatisticLine text="Average" value={average} />
+          {/* Para el porcentaje, formateamos el valor a 1 decimal y añadimos el símbolo '%' */}
+          <StatisticLine text="Positive percentage" value={`${percentage.toFixed(1)} %`} />
+        </tbody>
+      </table>
     </div>
   )
 }
