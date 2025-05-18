@@ -35,7 +35,7 @@ El repositorio está organizado por partes del curso. Cada carpeta principal cor
 Aquí puedes listar las partes que has completado. ¡Empieza con la Parte 0!
 
 - [x] Parte 0: Fundamentos de las aplicaciones web
-- [ ] Parte 1: Introducción a React
+- [x] Parte 1: Introducción a React
 - [ ] Parte 2: Comunicación con el servidor
 - [ ] Parte 3: Programación del servidor con Node.js y Express
 - [ ] Parte 4: Pruebas de servidores Express y administración de usuarios
