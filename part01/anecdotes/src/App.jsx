@@ -35,8 +35,12 @@ const App = () => {
   // Inicializa el índice a 0 (para mostrar la primera anécdota al cargar).
   const [selected, setSelected] = useState(0)
 
+  // Define una nueva variable de estado 'votes' para almacenar el número de votos por anécdota.
+  // Inicializa el array de votos con ceros, con una longitud igual al número de anécdotas.
+  const [votes, setVotes] = useState(Array(anecdotes.length).fill(0));
+
   // Función manejadora para el botón "Next anecdote".
-  const handleClick = () => {
+  const handleClickNext = () => {
     // Genera un número decimal aleatorio entre 0 (inclusive) y 1 (exclusivo).
     const randomNumber = Math.random();
     // Multiplica por la longitud del array para obtener un número entre 0 y anecdotes.length (exclusivo).
@@ -48,13 +52,28 @@ const App = () => {
     setSelected(randomIndex);
   }
 
+
+  // Función manejadora para el botón "Votar".
+  const handleClickVote = () => {
+    // 1. Crear una copia del array de votos actual.
+    const votesCopy = [...votes];
+    // 2. Incrementar el voto para la anécdota seleccionada (usando el índice 'selected').
+    votesCopy[selected] += 1;
+    // 3. Actualizar el estado 'votes' con la copia modificada.
+    // Esto le dice a React que el estado ha cambiado y que debe re-renderizar el componente.
+    setVotes(votesCopy);
+  };
+
   return (
     <div>
       <h1 style={{fontStyle: "bold"}}> Anécdotas y citas sobre programación </h1>
       {/* Muestra la anécdota seleccionada utilizando el índice almacenado en el estado */}
       <p style={{fontStyle: "italic"}}>{anecdotes[selected]}</p>
+      {/* Muestra el número de votos de la anécdota actual. */}
+      <p style={{textDecoration: "underline"}}>Tiene {votes[selected]} votos</p>
       {/* Renderiza el botón "Next anecdote" utilizando el componente Button, pasando la función manejadora */}
-      <Button handleClick={handleClick} text='Siguiente anécdota' />
+      <Button handleClick={handleClickVote} text='Votar' />
+      <Button handleClick={handleClickNext} text='Siguiente anécdota' />
     </div>
   )
 }
