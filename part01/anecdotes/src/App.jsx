@@ -10,16 +10,6 @@ const Button = ({ handleClick, text }) => (
 
 const App = () => {
   // Array de anécdotas de ingeniería de software.
-  // const anecdotes = [
-  //   'If it hurts, do it more often.',
-  //   'Adding manpower to a late software project makes it later!',
-  //   'The first 90 percent of the code accounts for the first 10 percent of the development time...The remaining 10 percent of the code accounts for the other 90 percent of the development time.',
-  //   'Any fool can write code that a computer can understand. Good programmers write code that humans can understand.',
-  //   'Premature optimization is the root of all evil.',
-  //   'Debugging is twice as hard as writing the code in the first place. Therefore, if you write the code as cleverly as possible, you are, by definition, not smart enough to debug it.',
-  //   'Programming without an extremely heavy use of console.log is same as if a doctor would refuse to use x-rays or blood tests when diagnosing patients.',
-  //   'The only way to go fast, is to go well.'
-  // ]
   const anecdotes = [
     'Si duele, hazlo más a menudo.',
     'Añadir personal a un proyecto de software retrasado, ¡lo retrasa aún más!',
@@ -52,7 +42,6 @@ const App = () => {
     setSelected(randomIndex);
   }
 
-
   // Función manejadora para el botón "Votar".
   const handleClickVote = () => {
     // 1. Crear una copia del array de votos actual.
@@ -64,9 +53,20 @@ const App = () => {
     setVotes(votesCopy);
   };
 
+  // Lógica para encontrar la anécdota más votada
+  // 1. Encontrar el número máximo de votos en el array 'votes'.
+  const maxVotes = Math.max(...votes);
+  // 2. Encontrar el índice de la anécdota con el número máximo de votos.
+  const indexOfMostVoted = votes.indexOf(maxVotes);
+  // 3. Obtener el texto de la anécdota más votada usando su índice.
+  const mostVotedAnecdote = anecdotes[indexOfMostVoted];
+  // Lógica para calcular el número total de votos
+  const totalVotes = votes.reduce((sum, currentVote) => sum + currentVote, 0);
+
   return (
     <div>
-      <h1 style={{fontStyle: "bold"}}> Anécdotas y citas sobre programación </h1>
+      <h1 style={{ color: 'darkgreen', fontWeight: 'bold', marginBottom: '20px' }}> Anécdotas y citas sobre programación </h1>
+      <h2 style={{ color: 'green', fontWeight: 'bold', marginTop: '30px', marginBottom: '10px' }}> Anécdota del día </h2>
       {/* Muestra la anécdota seleccionada utilizando el índice almacenado en el estado */}
       <p style={{fontStyle: "italic"}}>{anecdotes[selected]}</p>
       {/* Muestra el número de votos de la anécdota actual. */}
@@ -74,6 +74,19 @@ const App = () => {
       {/* Renderiza el botón "Next anecdote" utilizando el componente Button, pasando la función manejadora */}
       <Button handleClick={handleClickVote} text='Votar' />
       <Button handleClick={handleClickNext} text='Siguiente anécdota' />
+      {/* Muestra la anécdota seleccionada utilizando el índice almacenado en el estado */}
+      <h2 style={{ color: 'lightgreen', fontWeight: 'bold', marginTop: '30px', marginBottom: '10px' }}> Anécdota más votada </h2>
+      {/* **Muestra la anécdota más votada (o un mensaje si no hay votos)** */}
+      {/* Si maxVotes es 0, significa que nadie ha votado aún. */}
+      {maxVotes === 0 ? (
+        <p>Aún no hay votos.</p>
+      ) : (
+        // Si hay votos, muestra la anécdota más votada y su número de votos.
+        <div>
+          <p style={{ fontStyle: "italic" }}>{mostVotedAnecdote}</p>
+          <p style={{ textDecoration: "underline" }}>Tiene {maxVotes} votos de {totalVotes}</p>
+        </div>
+      )}
     </div>
   )
 }
