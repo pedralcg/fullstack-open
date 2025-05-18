@@ -6,6 +6,13 @@ const Button = ({ handleClick, text }) => (
   </button>
 )
 
+const StatisticLine = (props) => {
+  return (
+    <li>{props.text}: {props.value}</li>
+    // <p>{props.text}: {props.value}</p>
+  )
+}
+
 const Statistics = (props) => {
   // Recibe los valores de good, neutral y bad como props
   const good = props.good;
@@ -19,14 +26,15 @@ const Statistics = (props) => {
   return (
     <div>
       <h1>Statistics</h1>
-      <li>Good: {good}</li> 
-      <li>Neutral: {neutral}</li>
-      <li>Bad: {bad}</li>
-      <li>Total: {total}</li>
-      <li>Average: {average}</li>
-      <li>Positive percentage: {percentage} %</li>
+      {/* Usar el nuevo componente StatisticLine para cada estadística */}
+      <StatisticLine text="Good" value={good} />
+      <StatisticLine text="Neutral" value={neutral} />
+      <StatisticLine text="Bad" value={bad} />
+      <StatisticLine text="Total" value={total} />
+      <StatisticLine text="Average" value={average} />
+      <StatisticLine text="Positive percentage" value={`${percentage.toFixed(1)} %`} /> {/* Pasa el valor formateado */}
     </div>
-  );
+  )
 }
 
 
