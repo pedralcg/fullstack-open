@@ -34,7 +34,7 @@ Estos comandos se ejecutan **dentro del directorio de cada proyecto individual**
 
 ### Configuración Inicial del Proyecto (usando create-vite)
 
-Si aún no has creado el proyecto para un conjunto de ejercicios, asegúrate de estar en el directorio `part01/` (donde se encuentra este archivo `readme-part01.md`) y ejecuta:
+Si aún no has creado el proyecto para un conjunto de ejercicios, asegúrate de estar en el directorio `part01/` (donde se encuentra este archivo `README.md`) y ejecuta:
 
 ```bash
 npm create vite@latest part1 -- --template react
