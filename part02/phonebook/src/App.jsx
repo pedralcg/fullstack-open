@@ -3,13 +3,10 @@ import { useState } from 'react'
 const App = () => {
   // Estado para almacenar la lista de personas en la agenda
   const [persons, setPersons] = useState([
-    { 
-      name: 'Arto Hellas',
-      number: '040-123456'
-    }, { 
-      name: 'Ada Lovelace',
-      number: '39-44-5323523'
-    }
+    { name: 'Arto Hellas', number: '040-123456', id: 1 },
+    { name: 'Ada Lovelace', number: '39-44-5323523', id: 2 },
+    { name: 'Dan Abramov', number: '12-43-234345', id: 3 },
+    { name: 'Mary Poppendieck', number: '39-23-6423122', id: 4 }
   ])
 
   // Estado para controlar el valor del campo de entrada del nuevo nombre
@@ -18,17 +15,18 @@ const App = () => {
   // Estado para controlar el valor del campo de entrada del nuevo número
   const [newNumber, setNewNumber] = useState('')
 
+  //? Nuevo estado para el término de búsqueda**
+  const [searchTerm, setSearchTerm] = useState('');
+
   // Función manejadora para el evento 'submit' del formulario
   const addPerson = (event) => {
     // Previene el comportamiento por defecto de enviar el formulario (recargar la página)
     event.preventDefault(); 
 
-    //! Paso 1: Verificar si el nombre ya existe en la agenda
-    // Utiliza el método 'some()' para comprobar si alguna persona en el array 'persons'
-    // tiene el mismo nombre que el 'newName' actual (ignorando mayúsculas/minúsculas para una mejor UX).
+    //! Paso 1: Verificar si el nombre o número ya existe en la agenda
+    // Utiliza el método 'some()' para comprobar
     const nameExists = persons.some(person => person.name.toLowerCase() === newName.toLowerCase());
     const numberExists = persons.some(person => person.number === newNumber);
-
     if (nameExists && numberExists) {
       //! Paso 2a: Si el nombre y el número ya existe, emite una advertencia con alert()
       alert(`${newName} and ${newNumber} is already added to phonebook`);
@@ -39,11 +37,12 @@ const App = () => {
       //! Paso 2c: Si el número ya existe, emite una advertencia
       alert(`${newNumber} is already added to phonebook`);
     } else {
-      //! Paso 3: Si el nombre NO existe, procede a añadir la nueva persona
-      // Crea un nuevo objeto de persona con el nombre actual del campo de entrada
+      //! Paso 3: Si el nombre y el número NO existen, procede a añadir la nueva persona
       const personObject = {
         name: newName,
-        number: newNumber
+        number: newNumber,
+        // Asignamos una ID simple
+        id: persons.length > 0 ? Math.max(...persons.map(p => p.id)) + 1 : 1,
       };
       // Actualiza el estado 'persons' añadiendo la nueva persona.
       setPersons([...persons, personObject]);
@@ -66,9 +65,28 @@ const App = () => {
     setNewNumber(event.target.value);
   };
 
+  //? Nuevo manejador para el campo de búsqueda
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
+  };
+
+  //? Lógica de filtrado de personas
+  const filteredPersons = persons.filter(person =>
+    person.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div>
-      <h2>Phonebook</h2>
+      <h1>Phonebook</h1>
+      {/* Campo de búsqueda */}
+      <div>
+        Filter shown with:
+        <input
+          value={searchTerm}
+          onChange={handleSearchChange}
+        />
+      </div>
+      <h2>Add a new</h2>
       {/* Formulario para añadir nuevas personas */}
       {/* Asocia la función addPerson al evento submit */}
       <form onSubmit={addPerson}>
@@ -95,14 +113,16 @@ const App = () => {
           {/* Botón para enviar el formulario */}
         </div>
       </form>
-      {/* Elemento de depuración para ver el valor de newName */}
-      <div>debug: {newName}</div>
+      {/*//! Elemento de depuración */}
+      {/* <div>debug name: {newName}</div> */}
+      {/* <div>debug number: {newNumber}</div> */}
+      {/* <div>debug search: {searchTerm}</div> */}
       <h2>Numbers</h2>
       <div>
-        {/* Muestra la lista de personas */}
-        {persons.map(person => (
-          // Utiliza el nombre de la persona como 'key'
-          <p key={person.name}>{person.name} {person.number}</p>
+        {/* Muestra la lista de personas filtradas */}
+        {filteredPersons.map(person => (
+          // Utiliza la id de la persona como 'key'
+          <p key={person.id}>{person.name} {person.number}</p>
         ))}
       </div>
     </div>
