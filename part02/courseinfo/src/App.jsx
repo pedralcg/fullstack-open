@@ -29,6 +29,24 @@ const Header = ({ course }) => {
   );
 };
 
+
+// Componente Total: Calcula y muestra la suma de los ejercicios
+const Total = ({ parts }) => {
+  // Calcula la suma de los ejercicios usando reduce en el array 'parts'
+  // 'sum' es el acumulador, 'part' es el objeto de parte actual en la iteración.
+  // Empezamos la suma en 0.
+  const totalExercises = parts.reduce((sum, part) => sum + part.exercises, 0);
+  return(
+    <div>
+      <p style={{fontWeight: 'bold'}} >
+        {/* Muestra el total calculado */}
+        Total of {totalExercises} exercises
+      </p>
+    </div>
+  );
+};
+
+
 // Nuevo componente Course: responsable de renderizar un curso completo
 const Course = ({ course }) => {
   // El componente Course recibe el objeto 'course' como prop
@@ -38,9 +56,12 @@ const Course = ({ course }) => {
       <Header course={course} />
       {/* Usa el componente Content para mostrar las partes del curso */}
       <Content parts={course.parts} />
+      {/* **Renderiza el componente Total y pásale el array de partes del curso** */}
+      <Total parts={course.parts} />
     </div>
   );
 };
+
 
 
 // Componente App: Contiene toda la data y renderiza los componentes principales.
@@ -63,10 +84,16 @@ const App = () => {
         name: 'State of a component',
         exercises: 14,
         id: 3
+      },
+      {
+        name: 'Redux',
+        exercises: 11,
+        id: 4
       }
     ]
   }
 
+  // App solo renderiza el componente Course, pasándole los datos del curso
   return <Course course={course} />
 }
 
