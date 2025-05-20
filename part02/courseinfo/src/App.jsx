@@ -25,7 +25,7 @@ const Content = ({ parts }) => {
 // Componente para mostrar el encabezado (nombre) del curso
 const Header = ({ course }) => {
   return (
-    <h1>{course.name}</h1>
+    <h1 style={{fontWeight: 'bold', color: 'blue'}}>{course.name}</h1>
   );
 };
 
@@ -47,16 +47,19 @@ const Total = ({ parts }) => {
 };
 
 
-// Nuevo componente Course: responsable de renderizar un curso completo
+// Componente Course (singular): responsable de renderizar UN curso completo
+// Este componente sigue recibiendo un objeto 'course' individual como prop.
 const Course = ({ course }) => {
-  // El componente Course recibe el objeto 'course' como prop
+  // El componente Course recibe el objeto 'course' INDIVIDUAL como prop
   return (
     <div>
       {/* Usa el componente Header para mostrar el nombre del curso */}
+      {/* Le pasamos el objeto 'course' individual */}
       <Header course={course} />
       {/* Usa el componente Content para mostrar las partes del curso */}
+      {/* Le pasamos el array de partes de ESE curso individual */}
       <Content parts={course.parts} />
-      {/* **Renderiza el componente Total y pásale el array de partes del curso** */}
+      {/* Renderiza el componente Total y pásale el array de partes del curso */}
       <Total parts={course.parts} />
     </div>
   );
@@ -64,37 +67,66 @@ const Course = ({ course }) => {
 
 
 
-// Componente App: Contiene toda la data y renderiza los componentes principales.
+// Componente App: Contiene la data de TODOS los cursos y renderiza los componentes Course individuales.
 const App = () => {
-  const course = {
-    id: 1,
-    name: 'Half Stack application development',
-    parts: [
-      {
-        name: 'Fundamentals of React',
-        exercises: 10,
-        id: 1
-      },
-      {
-        name: 'Using props to pass data',
-        exercises: 7,
-        id: 2
-      },
-      {
-        name: 'State of a component',
-        exercises: 14,
-        id: 3
-      },
-      {
-        name: 'Redux',
-        exercises: 11,
-        id: 4
-      }
-    ]
-  }
+  const courses = [
+    {
+      name: 'Half Stack application development',
+      id: 1,
+      parts: [
+        {
+          name: 'Fundamentals of React',
+          exercises: 10,
+          id: 1
+        },
+        {
+          name: 'Using props to pass data',
+          exercises: 7,
+          id: 2
+        },
+        {
+          name: 'State of a component',
+          exercises: 14,
+          id: 3
+        },
+        {
+          name: 'Redux',
+          exercises: 11,
+          id: 4
+        }
+      ]
+    }, 
+    {
+      name: 'Node.js',
+      id: 2,
+      parts: [
+        {
+          name: 'Routing',
+          exercises: 3,
+          id: 1
+        },
+        {
+          name: 'Middlewares',
+          exercises: 7,
+          id: 2
+        }
+      ]
+    }
+  ]
 
-  // App solo renderiza el componente Course, pasándole los datos del curso
-  return <Course course={course} />
-}
+  // App ahora itera sobre el array 'courses' y renderiza un componente Course (singular) por cada curso
+  return (
+    <div>
+      {/* Utiliza map para transformar el array de objetos de curso en un array de componentes Course */}
+      {courses.map(course =>
+        // Por cada 'course' individual en el array 'courses', renderiza un componente Course
+        // Le pasamos el objeto 'course' individual como prop
+        // La prop 'key' es crucial cuando se renderizan listas. Usamos course.id como key.
+        <Course key={course.id} course={course} />
+      )}
+    </div>
+  );
+};
+
 
 export default App
