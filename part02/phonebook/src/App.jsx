@@ -11,14 +11,27 @@ const App = () => {
 
   // Función manejadora para el evento 'submit' del formulario
   const addPerson = (event) => {
-    event.preventDefault(); // Previene el comportamiento por defecto de enviar el formulario (recargar la página)
-    // Crea un nuevo objeto de persona con el nombre actual del campo de entrada
-    const personObject = {
-      name: newName,
-    };
-    // Actualiza el estado 'persons' añadiendo la nueva persona.
-    //! Importante: Crea una nueva copia del array para mantener la inmutabilidad del estado.
-    setPersons([...persons, personObject]);
+    // Previene el comportamiento por defecto de enviar el formulario (recargar la página)
+    event.preventDefault(); 
+
+    //! Paso 1: Verificar si el nombre ya existe en la agenda
+    // Utiliza el método 'some()' para comprobar si alguna persona en el array 'persons'
+    // tiene el mismo nombre que el 'newName' actual (ignorando mayúsculas/minúsculas para una mejor UX).
+    const nameExists = persons.some(person => person.name.toLowerCase() === newName.toLowerCase());
+
+    if (nameExists) {
+      //! Paso 2: Si el nombre ya existe, emite una advertencia con alert()
+      alert(`${newName} is already added to phonebook`);
+    } else {
+      //! Paso 3: Si el nombre NO existe, procede a añadir la nueva persona
+      // Crea un nuevo objeto de persona con el nombre actual del campo de entrada
+      const personObject = {
+        name: newName,
+      };
+      // Actualiza el estado 'persons' añadiendo la nueva persona.
+      setPersons([...persons, personObject]);
+    }
+    
     // Limpia el campo de entrada después de añadir la persona
     setNewName('');
   };
