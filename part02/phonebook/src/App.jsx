@@ -3,11 +3,20 @@ import { useState } from 'react'
 const App = () => {
   // Estado para almacenar la lista de personas en la agenda
   const [persons, setPersons] = useState([
-    { name: 'Arto Hellas' }
+    { 
+      name: 'Arto Hellas',
+      number: '040-123456'
+    }, { 
+      name: 'Ada Lovelace',
+      number: '39-44-5323523'
+    }
   ])
 
   // Estado para controlar el valor del campo de entrada del nuevo nombre
   const [newName, setNewName] = useState('')
+
+  // Estado para controlar el valor del campo de entrada del nuevo número
+  const [newNumber, setNewNumber] = useState('')
 
   // Función manejadora para el evento 'submit' del formulario
   const addPerson = (event) => {
@@ -18,15 +27,23 @@ const App = () => {
     // Utiliza el método 'some()' para comprobar si alguna persona en el array 'persons'
     // tiene el mismo nombre que el 'newName' actual (ignorando mayúsculas/minúsculas para una mejor UX).
     const nameExists = persons.some(person => person.name.toLowerCase() === newName.toLowerCase());
+    const numberExists = persons.some(person => person.number === newNumber);
 
-    if (nameExists) {
-      //! Paso 2: Si el nombre ya existe, emite una advertencia con alert()
+    if (nameExists && numberExists) {
+      //! Paso 2a: Si el nombre y el número ya existe, emite una advertencia con alert()
+      alert(`${newName} and ${newNumber} is already added to phonebook`);
+    } else if (nameExists ) {
+      //! Paso 2b: Si el nombre ya existe, emite una advertencia
       alert(`${newName} is already added to phonebook`);
+    } else if (numberExists) {
+      //! Paso 2c: Si el número ya existe, emite una advertencia
+      alert(`${newNumber} is already added to phonebook`);
     } else {
       //! Paso 3: Si el nombre NO existe, procede a añadir la nueva persona
       // Crea un nuevo objeto de persona con el nombre actual del campo de entrada
       const personObject = {
         name: newName,
+        number: newNumber
       };
       // Actualiza el estado 'persons' añadiendo la nueva persona.
       setPersons([...persons, personObject]);
@@ -34,12 +51,19 @@ const App = () => {
     
     // Limpia el campo de entrada después de añadir la persona
     setNewName('');
+    setNewNumber('');
   };
 
   // Función manejadora para el evento 'change' del campo de entrada del nombre
   const handleNameChange = (event) => {
     // Actualiza el estado 'newName' con el valor actual del campo de entrada
     setNewName(event.target.value);
+  };
+
+  // Función manejadora para el evento 'change' del campo de entrada del número
+  const handleNumberChange = (event) => {
+    // Actualiza el estado 'newNumber' con el valor actual del campo de entrada
+    setNewNumber(event.target.value);
   };
 
   return (
@@ -58,6 +82,15 @@ const App = () => {
           />
         </div>
         <div>
+          number:
+          <input
+            value={newNumber}
+            // El valor del input está controlado por el estado newNumber
+            onChange={handleNumberChange}
+            // Cada cambio en el input actualiza el estado newNumber
+          />
+        </div>
+        <div>
           <button type="submit">add</button>
           {/* Botón para enviar el formulario */}
         </div>
@@ -69,7 +102,7 @@ const App = () => {
         {/* Muestra la lista de personas */}
         {persons.map(person => (
           // Utiliza el nombre de la persona como 'key'
-          <p key={person.name}>{person.name}</p>
+          <p key={person.name}>{person.name} {person.number}</p>
         ))}
       </div>
     </div>
