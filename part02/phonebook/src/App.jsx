@@ -86,15 +86,19 @@ const App = () => {
 
   //* Hook useEffect para obtener los datos iniciales del servidor
   useEffect(() => {
-    console.log('effect')
+    console.log('effect');
     axios
-      .get('http://localhost:3001/persons')
+      .get('http://localhost:3001/persons') // Realiza una petición GET a la URL de tu json-server
       .then(response => {
-        console.log('promise fulfilled')
-        setPersons(response.data)
+        console.log('promise fulfilled');
+        setPersons(response.data); // Actualiza el estado 'persons' con los datos recibidos del servidor
       })
+      //! Añadimos el bloque catch para los errores
+      .catch(error => {
+        console.error('Error fetching initial persons:', error);
+      });
   }, [])
-  console.log('render', persons.length, 'persons')
+  console.log('render', persons.length, 'persons');
 
   // Función manejadora para el evento 'submit' del formulario
   const addPerson = (event) => {
@@ -116,10 +120,23 @@ const App = () => {
       const personObject = {
         name: newName,
         number: newNumber,
-        id: persons.length > 0 ? Math.max(...persons.map(p => p.id)) + 1 : 1,
+        //! El ID ya NO se genera en el frontend json-server lo asignará automáticamente 
       };
-      // Actualiza el estado 'persons' añadiendo la nueva persona.
-      setPersons([...persons, personObject]);
+      //* Enviar la nueva persona al servidor usando axios.post()
+      axios
+        // Realiza una petición POST
+        .post('http://localhost:3001/persons', personObject) 
+        .then(response => {
+          // La respuesta del servidor contendrá la persona con su ID asignado.
+          // Actualiza el estado 'persons' añadiendo la persona devuelta por el servidor.
+          setPersons(persons.concat(response.data));
+          setNewName('');
+          setNewNumber('');
+        })
+        .catch(error => {
+          console.error('Error adding person to backend:', error);
+          alert('Failed to add person to phonebook. Please check the server.');
+        });
     }
     // Limpia el campo de entrada después de añadir la persona
     setNewName('');
