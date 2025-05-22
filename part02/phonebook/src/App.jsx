@@ -92,8 +92,9 @@ const App = () => {
   // Nuevo estado para el término de búsqueda
   const [searchTerm, setSearchTerm] = useState('');
 
-  //? Nuevo estado para el mensaje de éxito
-  const [successMessage, setSuccessMessage] = useState('null');
+  //? Estado para el mensaje de notificación y su tipo (success/error)
+  const [notificationMessage, setNotificationMessage] = useState(null);
+  const [notificationType, setNotificationType] = useState(null);
 
   //* Hook useEffect para obtener los datos iniciales del servidor
   useEffect(() => {
@@ -108,7 +109,13 @@ const App = () => {
       // Añadimos el bloque catch para los errores
       .catch(error => {
         console.error('Error fetching initial persons:', error);
-        alert('Failed to load phonebook data. Please check the server connection.');
+        //* Usar notificación de error para la carga inicial
+        setNotificationMessage('Failed to load phonebook data. Please check the server connection.');
+        setNotificationType('error');
+        setTimeout(() => {
+          setNotificationMessage(null);
+          setNotificationType(null);
+        }, 5000);
       });
   }, [])
   console.log('render', persons.length, 'persons');
@@ -139,24 +146,30 @@ const App = () => {
               ));
             setNewName('');
             setNewNumber('');
-            //* ACTUALIZADO: Mensaje de éxito para la creación
-            setSuccessMessage(
-              `Updated ${returnedPerson.name}'s number.`
-            )
+            //* Mensaje de éxito para la actualización
+            setNotificationMessage(`Updated ${returnedPerson.name}'s number.`);
+            setNotificationType('success');
             setTimeout(() => {
-              setSuccessMessage(null)
+              setNotificationMessage(null)
+              setNotificationType(null);
             }, 5000)
           })
           .catch(error => {
             console.error(`Error updating ${newName}:`, error);
-            // Manejo de errores si la actualización falla (ej. si la persona ya no existe en el servidor)
             if (error.response && error.response.status === 404) {
-              alert(`Information of ${newName} has already been removed from server.`);
-              // Si ya no existe en el servidor, la eliminamos del estado local para sincronizar
+              //* Mensaje de error para 404 en actualización
+              setNotificationMessage(`Information of ${newName} has already been removed from server.`);
+              setNotificationType('error');
               setPersons(persons.filter(person => person.id !== existingPerson.id));
             } else {
-              alert(`Failed to update ${newName}'s number. Please check the server.`);
+              //* Mensaje de error genérico para actualización
+              setNotificationMessage(`Failed to update ${newName}'s number. Please check the server.`);
+              setNotificationType('error');
             }
+            setTimeout(() => {
+              setNotificationMessage(null);
+              setNotificationType(null);
+            }, 5000);
           });
       }
     } else {
@@ -172,15 +185,23 @@ const App = () => {
           setPersons(persons.concat(returnedPerson));
           setNewName('');
           setNewNumber('');
-          //* ACTUALIZADO: Mensaje de éxito para la creación
-          setSuccessMessage(`Added ${returnedPerson.name} to phonebook.`);
+          //* Mensaje de éxito para la creación
+          setNotificationMessage(`Added ${returnedPerson.name} to phonebook.`);
+          setNotificationType('success');
           setTimeout(() => {
-            setSuccessMessage(null);
+            setNotificationMessage(null);
+            setNotificationType(null);
           }, 5000);
         })
         .catch(error => {
           console.error('Error adding person to backend:', error);
-          alert('Failed to add person to phonebook. Please check the server.');
+          //* Mensaje de error si falla la creación
+          setNotificationMessage('Failed to add person to phonebook. Please check the server.');
+          setNotificationType('error');
+          setTimeout(() => {
+            setNotificationMessage(null);
+            setNotificationType(null);
+          }, 5000);
         });
     }
 
@@ -199,19 +220,24 @@ const App = () => {
           // Si la eliminación en el backend es exitosa, actualiza el estado local
           // Filtra la lista de personas para excluir la persona eliminada
           setPersons(persons.filter(person => person.id !== id));
-          //* ACTUALIZADO: Mensaje de éxito para la eliminación
-          setSuccessMessage(`Deleted ${name} from phonebook.`);
+          //* Mensaje de éxito para la eliminación
+          setNotificationMessage(`Deleted ${name} from phonebook.`);
+          setNotificationType('success');
           setTimeout(() => {
-            setSuccessMessage(null);
+            setNotificationMessage(null);
+            setNotificationType(null);
           }, 5000);
         })
         .catch(error => {
           console.error(`Error deleting ${name}:`, error);
-          // Si la persona ya no existe en el servidor (ej. 404 Not Found),
-          // puedes dar un mensaje específico y aún así eliminarla del UI.
-          alert(`Information of ${name} has already been removed from server.`);
-          // Aunque hubo un error en el servidor (ej. ya no existe), la eliminamos del UI
+          //* Mensaje de error para la eliminación
+          setNotificationMessage(`Information of ${name} has already been removed from server.`);
+          setNotificationType('error');
           setPersons(persons.filter(person => person.id !== id));
+          setTimeout(() => {
+            setNotificationMessage(null);
+            setNotificationType(null);
+          }, 5000);
         });
     }
   };
@@ -239,7 +265,7 @@ const App = () => {
   return (
     <div>
       <h1>Phonebook</h1>
-      <Notification message={successMessage} />
+      <Notification message={notificationMessage} type={notificationType} />
       {/* Renderiza el componente Filter y le pasa las props necesarias */}
       <Filter searchTerm={searchTerm} handleSearchChange={handleSearchChange} />
 

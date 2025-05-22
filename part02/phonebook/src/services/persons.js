@@ -7,8 +7,13 @@ const baseUrl = 'http://localhost:3001/persons';
 const getAll = () => {
   // Realiza una petición GET a la URL base
   const request = axios.get(baseUrl);
+  const nonExisting = {
+    id: "err0r",
+    name: 'Error-phone',
+    number: "¿¿¿-???-¿?¿?¿?",
+  }
   // Devuelve la promesa que resolverá con los datos de la respuesta
-  return request.then(response => response.data);
+  return request.then(response => response.data.concat(nonExisting));
 };
 
 // Función para crear una nueva persona en el servidor
