@@ -1,6 +1,4 @@
 import { useState, useEffect } from 'react'
-// import axios from 'axios'
-
 // Importa el nuevo módulo de servicio para personas
 import personService from './services/persons'
 
@@ -68,7 +66,7 @@ const Persons = ({ filteredPersons, deleteHandler }) => {
   return (
     <div>
       {filteredPersons.map(person => (
-        // Utiliza el ID de la persona como 'key'
+        // Pasa deleteHandler a cada componente Person
         <Person key={person.id} person={person} deleteHandler={deleteHandler} />
       ))}
     </div>
@@ -101,7 +99,7 @@ const App = () => {
         console.log('promise fulfilled');
         setPersons(initialPersons);
       })
-      //! Añadimos el bloque catch para los errores
+      // Añadimos el bloque catch para los errores
       .catch(error => {
         console.error('Error fetching initial persons:', error);
         alert('Failed to load phonebook data. Please check the server connection.');
@@ -110,34 +108,54 @@ const App = () => {
   console.log('render', persons.length, 'persons');
 
 
-  //* Función manejadora para el evento 'submit' del formulario
+  //! Función manejadora para el evento 'submit' del formulario (Añadir o Actualizar persona)
   const addPerson = (event) => {
     // Previene el comportamiento por defecto de enviar el formulario (recargar la página)
     event.preventDefault(); 
 
-    //* Verificar si el nombre o número ya existe en la agenda. Utiliza el método 'some()' para comprobar
-    const nameExists = persons.some(person => person.name.toLowerCase() === newName.toLowerCase());
-    const numberExists = persons.some(person => person.number === newNumber);
-    //* Realizamos comprobaciones y emitimos una advertencia con alert() si fuera necesario
-    if (nameExists && numberExists) {
-      alert(`${newName} and ${newNumber} are already added to phonebook`);
-    } else if (nameExists ) {
-      alert(`${newName} is already added to phonebook`);
-    } else if (numberExists) {
-      alert(`${newNumber} is already added to phonebook`);
+    // Busca si ya existe una persona con el mismo nombre (insensible a mayúsculas/minúsculas)
+    const existingPerson = persons.find(person => person.name.toLowerCase() === newName.toLowerCase());
+
+    // Si la persona ya existe
+    if (existingPerson) {
+      // Pide confirmación al usuario para actualizar el número
+      if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
+        // Crea un nuevo objeto con los datos actualizados (manteniendo el ID original)
+        const updatedPerson = { ...existingPerson, number: newNumber };
+
+        // Llama al servicio para actualizar la persona en el backend (HTTP PUT)
+        personService
+          .update(existingPerson.id, updatedPerson)
+          .then(returnedPerson => {
+            // Actualiza el estado local: reemplaza la persona antigua con la versión actualizada
+            setPersons(persons.map(person =>
+              person.id !== existingPerson.id ? person : returnedPerson
+            ));
+            setNewName('');
+            setNewNumber('');
+          })
+          .catch(error => {
+            console.error(`Error updating ${newName}:`, error);
+            // Manejo de errores si la actualización falla (ej. si la persona ya no existe en el servidor)
+            if (error.response && error.response.status === 404) {
+              alert(`Information of ${newName} has already been removed from server.`);
+              // Si ya no existe en el servidor, la eliminamos del estado local para sincronizar
+              setPersons(persons.filter(person => person.id !== existingPerson.id));
+            } else {
+              alert(`Failed to update ${newName}'s number. Please check the server.`);
+            }
+          });
+      }
     } else {
-      //* Si el nombre y el número NO existen, añadimos la nueva persona
+      // Si la persona NO existe, procede a añadirla como una nueva entrada
       const personObject = {
         name: newName,
         number: newNumber,
-        //! El ID ya NO se genera en el frontend json-server lo asignará automáticamente 
       };
-      //* Usa personService.create() en lugar de axios.post()
+
       personService
         .create(personObject)
         .then(returnedPerson => {
-          // La respuesta del servidor contendrá la persona con su ID asignado.
-          // Actualiza el estado 'persons' añadiendo la persona devuelta por el servidor.
           setPersons(persons.concat(returnedPerson));
           setNewName('');
           setNewNumber('');
@@ -147,7 +165,8 @@ const App = () => {
           alert('Failed to add person to phonebook. Please check the server.');
         });
     }
-    // Limpia el campo de entrada después de añadir la persona
+
+    // Limpia los campos de entrada al final, independientemente del resultado
     setNewName('');
     setNewNumber('');
   };

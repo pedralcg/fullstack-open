@@ -26,12 +26,22 @@ const remove = id => {
   const request = axios.delete(`${baseUrl}/${id}`);
   // Para las peticiones DELETE, a menudo no se necesita la data de la respuesta, solo confirmar que se completó.
   // axios.delete resuelve con el objeto de respuesta, no directamente con 'data' como GET/POST.
-  return request.then(response => response.data); // Puedes devolver response.data o simplemente la promesa
+  return request.then(response => response.data);
+};
+
+// Función para actualizar una persona existente en el servidor
+const update = (id, newObject) => {
+  // Realiza una petición PUT a la URL específica de la persona (baseUrl + id)
+  // Envía el 'newObject' (la versión actualizada de la persona) en el cuerpo de la petición
+  const request = axios.put(`${baseUrl}/${id}`, newObject);
+  // Devuelve la promesa que resolverá con los datos de la respuesta
+  return request.then(response => response.data);
 };
 
 // Exporta las funciones para que puedan ser utilizadas en otros módulos
 export default {
   getAll,
   create,
-  remove
+  remove,
+  update
 };
