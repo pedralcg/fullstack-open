@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react'
 // Importa el nuevo módulo de servicio para personas
 import personService from './services/persons'
+import Notification from './components/Notification'
+import './index.css'
+
 
 
 //! Componente Filter: Para el campo de búsqueda
@@ -86,8 +89,11 @@ const App = () => {
   // Estado para controlar el valor del campo de entrada del nuevo número
   const [newNumber, setNewNumber] = useState('')
 
-  //? Nuevo estado para el término de búsqueda**
+  // Nuevo estado para el término de búsqueda
   const [searchTerm, setSearchTerm] = useState('');
+
+  //? Nuevo estado para el mensaje de éxito
+  const [successMessage, setSuccessMessage] = useState('null');
 
   //* Hook useEffect para obtener los datos iniciales del servidor
   useEffect(() => {
@@ -130,9 +136,16 @@ const App = () => {
             // Actualiza el estado local: reemplaza la persona antigua con la versión actualizada
             setPersons(persons.map(person =>
               person.id !== existingPerson.id ? person : returnedPerson
-            ));
+              ));
             setNewName('');
             setNewNumber('');
+            //* ACTUALIZADO: Mensaje de éxito para la creación
+            setSuccessMessage(
+              `Updated ${returnedPerson.name}'s number.`
+            )
+            setTimeout(() => {
+              setSuccessMessage(null)
+            }, 5000)
           })
           .catch(error => {
             console.error(`Error updating ${newName}:`, error);
@@ -159,6 +172,11 @@ const App = () => {
           setPersons(persons.concat(returnedPerson));
           setNewName('');
           setNewNumber('');
+          //* ACTUALIZADO: Mensaje de éxito para la creación
+          setSuccessMessage(`Added ${returnedPerson.name} to phonebook.`);
+          setTimeout(() => {
+            setSuccessMessage(null);
+          }, 5000);
         })
         .catch(error => {
           console.error('Error adding person to backend:', error);
@@ -181,6 +199,11 @@ const App = () => {
           // Si la eliminación en el backend es exitosa, actualiza el estado local
           // Filtra la lista de personas para excluir la persona eliminada
           setPersons(persons.filter(person => person.id !== id));
+          //* ACTUALIZADO: Mensaje de éxito para la eliminación
+          setSuccessMessage(`Deleted ${name} from phonebook.`);
+          setTimeout(() => {
+            setSuccessMessage(null);
+          }, 5000);
         })
         .catch(error => {
           console.error(`Error deleting ${name}:`, error);
@@ -216,7 +239,7 @@ const App = () => {
   return (
     <div>
       <h1>Phonebook</h1>
-
+      <Notification message={successMessage} />
       {/* Renderiza el componente Filter y le pasa las props necesarias */}
       <Filter searchTerm={searchTerm} handleSearchChange={handleSearchChange} />
 
