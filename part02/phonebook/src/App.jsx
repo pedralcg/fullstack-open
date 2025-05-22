@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
+// import axios from 'axios'
+
+// Importa el nuevo módulo de servicio para personas
+import personService from './services/persons'
 
 
 //! Componente Filter: Para el campo de búsqueda
@@ -87,15 +90,17 @@ const App = () => {
   //* Hook useEffect para obtener los datos iniciales del servidor
   useEffect(() => {
     console.log('effect');
-    axios
-      .get('http://localhost:3001/persons') // Realiza una petición GET a la URL de tu json-server
-      .then(response => {
+    // Usa personService.getAll() en lugar de axios.get()
+    personService
+      .getAll()
+      .then(initialPersons => {
         console.log('promise fulfilled');
-        setPersons(response.data); // Actualiza el estado 'persons' con los datos recibidos del servidor
+        setPersons(initialPersons);
       })
       //! Añadimos el bloque catch para los errores
       .catch(error => {
         console.error('Error fetching initial persons:', error);
+        alert('Failed to load phonebook data. Please check the server connection.');
       });
   }, [])
   console.log('render', persons.length, 'persons');
@@ -122,14 +127,13 @@ const App = () => {
         number: newNumber,
         //! El ID ya NO se genera en el frontend json-server lo asignará automáticamente 
       };
-      //* Enviar la nueva persona al servidor usando axios.post()
-      axios
-        // Realiza una petición POST
-        .post('http://localhost:3001/persons', personObject) 
-        .then(response => {
+      //* Usa personService.create() en lugar de axios.post()
+      personService
+        .create(personObject)
+        .then(returnedPerson => {
           // La respuesta del servidor contendrá la persona con su ID asignado.
           // Actualiza el estado 'persons' añadiendo la persona devuelta por el servidor.
-          setPersons(persons.concat(response.data));
+          setPersons(persons.concat(returnedPerson));
           setNewName('');
           setNewNumber('');
         })
