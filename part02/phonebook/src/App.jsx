@@ -52,20 +52,24 @@ const PersonForm = ({addPerson, newName, newNumber, handleNameChange, handleNumb
 
 //! Componente Person: Para mostrar los detalles de una sola persona
 // Recibe un objeto 'person' como prop.
-const Person = ({person}) => {
+const Person = ({person, deleteHandler}) => {
   return (
-    <p>{person.name} {person.number}</p>
+    <p>
+      {person.name} {person.number}
+      {/* Botón de eliminación. Llama a deleteHandler con el ID y el nombre de la persona */}
+      <button onClick={() => deleteHandler(person.id, person.name)}>delete</button>
+    </p>
   )
 }
 
 //! Componente Persons: Para mostrar la lista de personas filtradas
 // Recibe el array de personas filtradas como prop.
-const Persons = ({ filteredPersons }) => {
+const Persons = ({ filteredPersons, deleteHandler }) => {
   return (
     <div>
       {filteredPersons.map(person => (
         // Utiliza el ID de la persona como 'key'
-        <Person key={person.id} person={person} />
+        <Person key={person.id} person={person} deleteHandler={deleteHandler} />
       ))}
     </div>
   );
@@ -105,7 +109,8 @@ const App = () => {
   }, [])
   console.log('render', persons.length, 'persons');
 
-  // Función manejadora para el evento 'submit' del formulario
+
+  //* Función manejadora para el evento 'submit' del formulario
   const addPerson = (event) => {
     // Previene el comportamiento por defecto de enviar el formulario (recargar la página)
     event.preventDefault(); 
@@ -145,6 +150,28 @@ const App = () => {
     // Limpia el campo de entrada después de añadir la persona
     setNewName('');
     setNewNumber('');
+  };
+
+  //* Función para manejar la eliminación de una persona
+  const handleDelete = (id, name) => {
+    // Pide confirmación al usuario antes de eliminar
+    if (window.confirm(`Delete ${name}?`)) {
+      personService
+        .remove(id) // Llama a la función 'remove' del servicio con el ID de la persona
+        .then(() => {
+          // Si la eliminación en el backend es exitosa, actualiza el estado local
+          // Filtra la lista de personas para excluir la persona eliminada
+          setPersons(persons.filter(person => person.id !== id));
+        })
+        .catch(error => {
+          console.error(`Error deleting ${name}:`, error);
+          // Si la persona ya no existe en el servidor (ej. 404 Not Found),
+          // puedes dar un mensaje específico y aún así eliminarla del UI.
+          alert(`Information of ${name} has already been removed from server.`);
+          // Aunque hubo un error en el servidor (ej. ya no existe), la eliminamos del UI
+          setPersons(persons.filter(person => person.id !== id));
+        });
+    }
   };
 
   // Función manejadora para el evento 'change' del campo de entrada del nombre
@@ -193,7 +220,8 @@ const App = () => {
       <h2>Numbers</h2>
       
       {/* Renderiza el componente Persons y le pasa la lista filtrada */}
-      <Persons filteredPersons={filteredPersons} />
+      {/* Pasa la nueva función handleDelete al componente Persons */}
+      <Persons filteredPersons={filteredPersons} deleteHandler={handleDelete} />
     </div>
   )
 }

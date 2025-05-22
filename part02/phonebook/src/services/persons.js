@@ -20,8 +20,18 @@ const create = newObject => {
   return request.then(response => response.data);
 };
 
+// Función para eliminar una persona del servidor
+const remove = id => {
+  // Realiza una petición DELETE a la URL específica del recurso (baseUrl + id)
+  const request = axios.delete(`${baseUrl}/${id}`);
+  // Para las peticiones DELETE, a menudo no se necesita la data de la respuesta, solo confirmar que se completó.
+  // axios.delete resuelve con el objeto de respuesta, no directamente con 'data' como GET/POST.
+  return request.then(response => response.data); // Puedes devolver response.data o simplemente la promesa
+};
+
 // Exporta las funciones para que puedan ser utilizadas en otros módulos
 export default {
   getAll,
   create,
+  remove
 };
