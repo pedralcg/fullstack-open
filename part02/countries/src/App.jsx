@@ -2,20 +2,26 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 //! Componente para mostrar un solo país en la lista de resultados
-const CountryListItem = ({ country }) => {
+const CountryListItem = ({ country, handleShowDetails }) => {
   return (
-    <p>{country.name.common}</p>
+    <p>
+      {country.name.common}
+      {/* Botón para mostrar los detalles de un país específico */}
+      <button onClick={() => handleShowDetails(country)}>show</button>
+    </p>
   );
 };
 
 //! Componente para mostrar los detalles de un solo país
-const CountryDetails = ({ country }) => {
+const CountryDetails = ({ country, handleBackToList }) => {
   // Verifica si country, capital y languages existen antes de acceder a sus propiedades
   const capital = country.capital && country.capital.length > 0 ? country.capital[0] : 'N/A';
   const languages = country.languages ? Object.values(country.languages) : [];
 
   return (
     <div>
+      {/* Botón para volver al listado */}
+      <button onClick={handleBackToList}>Back to List</button>
       {/* Nombre común del país */}
       <h2>{country.name.common}</h2>
       {/* Capital del país */}
@@ -54,7 +60,10 @@ const App = () => {
   // Almacena los países filtrados localmente
   const [filteredCountries, setFilteredCountries] = useState([]); 
   // Estado para mensajes al usuario (ej. "demasiados resultados")
-  const [message, setMessage] = useState(''); 
+  const [message, setMessage] = useState('');
+  // Muestra detalles de un solo país seleccionado
+  const [selectedCountry, setSelectedCountry] = useState(null);
+
 
   //* Primer useEffect: Carga todos los países una sola vez al inicio
   useEffect(() => {
@@ -73,46 +82,64 @@ const App = () => {
   // Dependencia vacía: se ejecuta solo una vez al montar el componente
   }, []); 
 
-  //* Segundo useEffect: Filtra los países en el cliente cuando el searchTerm o allCountries cambian
-  useEffect(() => {
-    // Borra mensajes anteriores
-    setMessage('');
+  //! Encapsulado de la lógica de filtrado
+  const applyFilter = (currentSearchTerm, currentAllCountries) => {
+    setMessage(''); // Borra mensajes antes de filtrar
 
-    if (!searchTerm) {
-      // Si no hay término de búsqueda, no hay países filtrados
-      setFilteredCountries([]); 
+    if (!currentSearchTerm) {
+      setFilteredCountries([]);
       return;
     }
 
-    const lowerCaseSearchTerm = searchTerm.toLowerCase();
-    // Filtra los países de 'allCountries' basándose en el término de búsqueda
-    const matches = allCountries.filter(country =>
+    const lowerCaseSearchTerm = currentSearchTerm.toLowerCase();
+    const matches = currentAllCountries.filter(country =>
       country.name.common.toLowerCase().includes(lowerCaseSearchTerm)
     );
 
     if (matches.length > 10) {
-      // Más de 10 resultados
-      setMessage('Too many matches, specify another filter.'); 
-      // Limpia la lista de países filtrados
-      setFilteredCountries([]); 
+      setMessage('Too many matches, specify another filter.');
+      setFilteredCountries([]);
     } else if (matches.length > 1) {
-      // Entre 2 y 10 resultados, muestra la lista
-      setFilteredCountries(matches); 
+      setFilteredCountries(matches);
     } else if (matches.length === 1) {
-      // Exactamente 1 resultado
-      setFilteredCountries(matches); 
-      // Se renderizará directamente cuando filteredCountries.length sea 1.
+      setFilteredCountries(matches);
+      setSelectedCountry(matches[0]); // Auto-selecciona si solo hay una coincidencia
     } else {
-      // Ningún resultado
-      setMessage('No countries found matching your search.'); 
+      setMessage('No countries found matching your search.');
       setFilteredCountries([]);
     }
-  // Se ejecuta cuando searchTerm o allCountries cambian
+  };
+
+  //? Segundo useEffect: Filtra los países en el cliente cuando el searchTerm o allCountries cambian
+  useEffect(() => {
+    // Reinicia el país seleccionado cuando el término de búsqueda cambia
+    setSelectedCountry(null);
+    // Llama a la función de filtrado
+    applyFilter(searchTerm, allCountries);
+    // Se ejecuta cuando searchTerm o allCountries cambian 
   }, [searchTerm, allCountries]); 
 
   // Manejador para el cambio en el campo de búsqueda
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
+  };
+
+  //! Manejador para el botón 'show' en la lista de países
+  const handleShowDetails = (country) => {
+    // Establece el país para mostrar sus detalles
+    setSelectedCountry(country); 
+    // Limpia cualquier mensaje de "demasiados resultados"
+    setMessage(''); 
+    // Limpia la lista para que solo se muestren los detalles
+    setFilteredCountries([]); 
+  };
+
+  //! Manejador para el botón 'Back to List'
+  const handleBackToList = () => {
+    // Borra el país seleccionado para volver a la vista de lista/búsqueda
+    setSelectedCountry(null); 
+    // Vuelve a aplicar el filtro para restaurar la lista anterior
+    applyFilter(searchTerm, allCountries);
   };
 
 
@@ -131,21 +158,22 @@ const App = () => {
       {/* Muestra mensajes al usuario */}
       {message && <p>{message}</p>}
 
-      {/* Renderiza los detalles de un país si solo hay un país filtrado */}
-      {filteredCountries.length === 1 && (
-        // Muestra los detalles del único país encontrado
-        <CountryDetails country={filteredCountries[0]} /> 
+      {/* Renderizado condicional: Prioriza la vista de detalles de un país seleccionado */}
+      {selectedCountry ? (
+        <CountryDetails country={selectedCountry} handleBackToList={handleBackToList} />
+      ) : (
+        // Si no hay un país seleccionado, renderiza la lista de países filtrados
+        // o el mensaje de "demasiados resultados"
+        filteredCountries.length > 1 && filteredCountries.length <= 10 && (
+          <div>
+            {filteredCountries.map(country => (
+              // Pasa el manejador handleShowDetails a cada CountryListItem
+              <CountryListItem key={country.cca2} country={country} handleShowDetails={handleShowDetails} />
+            ))}
+          </div>
+        )
       )}
-
-      {/* Si hay entre 2 y 10 países filtrados, muestra la lista */}
-      {filteredCountries.length > 1 && filteredCountries.length <= 10 && (
-        <div>
-          {filteredCountries.map(country => (
-            // Usa cca2 como key único
-            <CountryListItem key={country.cca2} country={country} />
-          ))}
-        </div>
-      )}
+      {/*//! El caso de un solo país que coincide automáticamente ya se maneja estableciendo selectedCountry en el segundo useEffect */}
     </div>
   );
 };
