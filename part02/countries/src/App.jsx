@@ -14,9 +14,41 @@ const CountryListItem = ({ country, handleShowDetails }) => {
 
 //! Componente para mostrar los detalles de un solo país
 const CountryDetails = ({ country, handleBackToList }) => {
+  // Estados para la información meteorológica
+  const [weather, setWeather] = useState(null);
+  const [weatherMessage, setWeatherMessage] = useState('');
+
   // Verifica si country, capital y languages existen antes de acceder a sus propiedades
   const capital = country.capital && country.capital.length > 0 ? country.capital[0] : 'N/A';
   const languages = country.languages ? Object.values(country.languages) : [];
+
+  //! NUEVO useEffect: Para obtener los datos meteorológicos
+  useEffect(() => {
+    // Solo busca el clima si hay una capital válida
+    if (capital !== 'N/A') { 
+      setWeatherMessage('Loading weather data...');
+      // Accede a la clave API desde las variables de entorno de Vite
+      const api_key = import.meta.env.VITE_OPEN_WEATHER_API_KEY;
+
+      // URL de la API de OpenWeatherMap para el clima actual por nombre de ciudad
+      // Usamos 'units=metric' para obtener temperatura en Celsius
+      axios
+        .get(`https://api.openweathermap.org/data/2.5/weather?q=${capital}&appid=${api_key}&units=metric`)
+        .then(response => {
+          setWeather(response.data);
+          setWeatherMessage(''); // Limpia el mensaje de carga
+        })
+        .catch(error => {
+          console.error('Error fetching weather data:', error);
+          setWeatherMessage('Could not fetch weather data for capital.');
+          setWeather(null); // Limpia los datos del clima en caso de error
+        });
+    } else {
+      setWeatherMessage('No capital available for weather data.');
+      setWeather(null);
+    }
+  // Este efecto se ejecuta cada vez que la capital del país cambia
+  }, [capital]); 
 
   return (
     <div>
@@ -46,6 +78,26 @@ const CountryDetails = ({ country, handleBackToList }) => {
       {/* Muestra la bandera del país */}
       {country.flags && country.flags.png && (
         <img src={country.flags.png} alt={`Flag of ${country.name.common}`} width="150" />
+      )}
+      {/*//! Información meteorológica */}
+      <h3>Weather in {capital}</h3>
+      {weatherMessage && <p>{weatherMessage}</p>}
+      {weather && (
+        <div>
+          <p>Temperature: {weather.main.temp} Celsius</p>
+          {/* Icono meteorológico */}
+          {weather.weather && weather.weather[0] && (
+            <img
+              src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png`}
+              alt={weather.weather[0].description}
+              width="50"
+            />
+          )} {weather.weather[0].description}
+          <p>Wind: {weather.wind.speed} m/s</p>
+          <p>Humidity: {weather.main.humidity}%</p>
+          <p>Pressure: {weather.main.pressure} hPa</p>
+          <p>Clouds: {weather.clouds.all}%</p>
+        </div>
       )}
     </div>
   );
