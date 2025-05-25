@@ -1,80 +1,12 @@
 import { useState, useEffect } from 'react'
 // Importa el nuevo módulo de servicio para personas
 import personService from './services/persons'
+import Filter from './components/Filter'
 import Notification from './components/Notification'
+import PersonForm from './components/PersonForm'
+import Persons from './components/Persons'
+
 import './index.css'
-
-
-
-//! Componente Filter: Para el campo de búsqueda
-// Recibe el término de búsqueda y el manejador de cambios como props.
-const Filter = ({searchTerm, handleSearchChange}) => {
-  return (
-    <div>
-      Filter shown with:
-      <input
-        value={searchTerm}
-        onChange={handleSearchChange}
-      />
-    </div>
-  )
-}
-
-//! Componente PersonForm: Para el formulario de añadir nuevas personas
-// Recibe la función para añadir personas, y los estados/manejadores de los inputs.
-const PersonForm = ({addPerson, newName, newNumber, handleNameChange, handleNumberChange}) => {
-  return (
-    <form onSubmit={addPerson}>
-        <div>
-          name:
-          <input
-            value={newName}
-            // El valor del input está controlado por el estado newName
-            onChange={handleNameChange}
-            // Cada cambio en el input actualiza el estado newName
-          />
-        </div>
-        <div>
-          number:
-          <input
-            value={newNumber}
-            // El valor del input está controlado por el estado newNumber
-            onChange={handleNumberChange}
-            // Cada cambio en el input actualiza el estado newNumber
-          />
-        </div>
-        <div>
-          <button type="submit">add</button>
-          {/* Botón para enviar el formulario */}
-        </div>
-      </form>
-  )
-}
-
-//! Componente Person: Para mostrar los detalles de una sola persona
-// Recibe un objeto 'person' como prop.
-const Person = ({person, deleteHandler}) => {
-  return (
-    <p>
-      {person.name} {person.number}
-      {/* Botón de eliminación. Llama a deleteHandler con el ID y el nombre de la persona */}
-      <button onClick={() => deleteHandler(person.id, person.name)}>delete</button>
-    </p>
-  )
-}
-
-//! Componente Persons: Para mostrar la lista de personas filtradas
-// Recibe el array de personas filtradas como prop.
-const Persons = ({ filteredPersons, deleteHandler }) => {
-  return (
-    <div>
-      {filteredPersons.map(person => (
-        // Pasa deleteHandler a cada componente Person
-        <Person key={person.id} person={person} deleteHandler={deleteHandler} />
-      ))}
-    </div>
-  );
-};
 
 
 //! Componente principal de la aplicación
