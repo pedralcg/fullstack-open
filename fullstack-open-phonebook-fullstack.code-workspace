@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"path": "../fullstack-open-phonebook-backend"
+		},
+		{
+			"path": "part02/phonebook"
+		}
+	],
+	"settings": {}
+}
