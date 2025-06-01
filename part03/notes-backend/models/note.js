@@ -5,19 +5,19 @@ const url = process.env.MONGODB_URI
 
 // Validar que la URL de MongoDB se ha cargado correctamente
 if (!url) {
-  console.error('Error: MONGODB_URI not found in .env file or environment variables.');
-  console.error('Please make sure you have a .env file with MONGODB_URI=your_connection_string');
-  process.exit(1);
+  console.error('Error: MONGODB_URI not found in .env file or environment variables.')
+  console.error('Please make sure you have a .env file with MONGODB_URI=your_connection_string')
+  process.exit(1)
 }
 
 mongoose.set('strictQuery', false)
 mongoose.connect(url)
   .then(() => {
-    console.log('Connected to MongoDB');
+    console.log('Connected to MongoDB')
   })
   .catch((error) => {
-    console.log('Error connecting to MongoDB:', error.message);
-  });
+    console.log('Error connecting to MongoDB:', error.message)
+  })
 
 const noteSchema = new mongoose.Schema({
   content: {

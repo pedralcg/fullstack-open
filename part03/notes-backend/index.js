@@ -80,32 +80,29 @@ app.post('/api/notes', (request, response, next) => {
 
 //* PUT /api/notes/:id
 app.put('/api/notes/:id', (request, response, next) => {
-    const { content, important } = request.body
+  const { content, important } = request.body
   // Contiene el contenido y la importancia actualizados
 
   // findByIdAndUpdate:
-    Note.findByIdAndUpdate(
-      request.params.id,
-      { content, important }, // Objeto con los campos a actualizar
-      { new: true, runValidators: true, context: 'query' } // Opciones clave
-    )
-      .then(updatedNote => {
-        if (updatedNote) { // Verificar si se encontró la nota
-          response.json(updatedNote)
-        } else {
-          response.status(404).end() // Nota no encontrada
-        }
-      })
-      .catch(error => next(error)) // Pasa el error al errorHandler
+  Note.findByIdAndUpdate(
+    request.params.id,
+    { content, important }, // Objeto con los campos a actualizar
+    { new: true, runValidators: true, context: 'query' } // Opciones clave
+  )
+    .then(updatedNote => {
+      if (updatedNote) { // Verificar si se encontró la nota
+        response.json(updatedNote)
+      } else {
+        response.status(404).end() // Nota no encontrada
+      }
+    })
+    .catch(error => next(error)) // Pasa el error al errorHandler
 })
 
 //* DELETE /api/notes/:id
 app.delete('/api/notes/:id', (request, response, next) => {
   Note.findByIdAndDelete(request.params.id) // Usa findByIdAndDelete de Mongoose
-    .then(result => {
-      // result será el documento eliminado si se encontró, o null si no
-      // Puedes verificar 'result' si quieres diferentes códigos de estado
-      // Por ahora, 204 es común para éxito, independientemente de si se encontró o no
+    .then(() => {
       response.status(204).end()
     })
     .catch(error => next(error)) // Pasa el error al errorHandler
