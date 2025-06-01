@@ -16,6 +16,24 @@ const requestLogger = (request, response, next) => {
   next()
 }
 
+//! NUEVO: Middleware de manejo de errores
+const errorHandler = (error, request, response, next) => {
+  // Imprime el mensaje de error para depuración en la consola del servidor
+  console.error(error.message)
+
+  if (error.name === 'CastError') {
+    // Si el error es un CastError (ID malformado)
+    return response.status(400).send({ error: 'malformatted id' })
+    // Error de validación
+  } else if (error.name === 'ValidationError') {
+    return response.status(400).json({ error: error.message })
+  }
+
+  // Para otros tipos de errores, pasa el control al siguiente middleware de Express
+  // (incluido el manejador de errores predeterminado de Express si no hay más)
+  next(error)
+}
+
 app.use(express.json())
 app.use(requestLogger)
 app.use(express.static('dist'))
@@ -49,12 +67,6 @@ app.get('/api/notes/:id', (request, response, next) => {
 app.post('/api/notes', (request, response, next) => {
   const body = request.body
 
-  if (!body.content) {
-    return response.status(400).json({
-      error: 'content missing',
-    })
-  }
-
   const note = new Note({
     content: body.content,
     important: body.important || false,
@@ -68,29 +80,23 @@ app.post('/api/notes', (request, response, next) => {
 
 //* PUT /api/notes/:id
 app.put('/api/notes/:id', (request, response, next) => {
-  const body = request.body // Contiene el contenido y la importancia actualizados
-
-  // Crea un objeto simple con los campos a actualizar
-  // No necesitas 'new Note({...})' aquí, Mongoose espera un objeto JS plano
-  const note = {
-    content: body.content,
-    important: body.important,
-  }
+    const { content, important } = request.body
+  // Contiene el contenido y la importancia actualizados
 
   // findByIdAndUpdate:
-  // 1er arg: el ID de la nota a actualizar
-  // 2do arg: el objeto con los datos a actualizar
-  // 3er arg: opciones. { new: true } devuelve la nota actualizada, no la original.
-  Note.findByIdAndUpdate(request.params.id, note, { new: true, runValidators: true, context: 'query' }) // Añadir runValidators: true y context: 'query' para futuras validaciones
-    .then(updatedNote => {
-      // Si updatedNote es null, significa que no se encontró la nota con ese ID
-      if (updatedNote) {
-        response.json(updatedNote)
-      } else {
-        response.status(404).end() // Nota no encontrada
-      }
-    })
-    .catch(error => next(error)) // Pasa el error al errorHandler
+    Note.findByIdAndUpdate(
+      request.params.id,
+      { content, important }, // Objeto con los campos a actualizar
+      { new: true, runValidators: true, context: 'query' } // Opciones clave
+    )
+      .then(updatedNote => {
+        if (updatedNote) { // Verificar si se encontró la nota
+          response.json(updatedNote)
+        } else {
+          response.status(404).end() // Nota no encontrada
+        }
+      })
+      .catch(error => next(error)) // Pasa el error al errorHandler
 })
 
 //* DELETE /api/notes/:id
@@ -111,22 +117,6 @@ const unknownEndpoint = (request, response) => {
 }
 
 app.use(unknownEndpoint)
-
-
-//! ** NUEVO: Middleware de manejo de errores **
-const errorHandler = (error, request, response, next) => {
-  // Imprime el mensaje de error para depuración en la consola del servidor
-  console.error(error.message)
-
-  if (error.name === 'CastError') {
-    // Si el error es un CastError (ID malformado)
-    return response.status(400).send({ error: 'malformatted id' })
-  }
-
-  // Para otros tipos de errores, pasa el control al siguiente middleware de Express
-  // (incluido el manejador de errores predeterminado de Express si no hay más)
-  next(error)
-}
 
 //* ¡Este debe ser el último middleware cargado!
 app.use(errorHandler)
