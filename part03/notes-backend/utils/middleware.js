@@ -13,12 +13,32 @@ const unknownEndpoint = (request, response) => {
 }
 
 const errorHandler = (error, request, response, next) => {
-  logger.error(error.message)
+  logger.error(error.message) // Sigue logueando el error para depuración
 
-  if (error.name === 'CastError') {
-    return response.status(400).send({ error: 'malformatted id' })
-  } else if (error.name === 'ValidationError') {
+  // Manejo específico para errores de validación de Mongoose
+  if (error.name === 'ValidationError') {
+    // Para mensajes de error más amigables (ej. "User validation failed: username: Path `username` (mluukkai) is not unique.")
     return response.status(400).json({ error: error.message })
+  }
+
+  // Manejo para errores de 'CastError' (ID mal formado)
+  if (error.name === 'CastError') {
+    // En tu caso de Post, si el user ID no es válido para ObjectId, puede ser CastError.
+    return response.status(400).send({ error: 'malformed id' })
+  }
+
+  // <--- ¡AÑADE ESTE BLOQUE para duplicados (username unique)! --->
+  // error.code 11000 es el código de error de MongoDB para "Duplicate key error"
+  if (error.code === 11000 && error.name === 'MongoServerError') {
+    return response.status(400).json({ error: 'expected `username` to be unique' })
+  // Token invalido o ausente
+  } else if (error.name ===  'JsonWebTokenError') {
+    return response.status(401).json({ error: 'token invalid' })
+    // Token expirado
+  } else if (error.name === 'TokenExpiredError') {
+    return response.status(401).json({
+      error: 'token expired'
+    })
   }
 
   next(error)

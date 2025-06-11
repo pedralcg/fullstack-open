@@ -1,0 +1,54 @@
+### Crear un nuevo usuario
+POST http://localhost:3001/api/users
+Content-Type: application/json
+
+{
+    "username": "root",
+    "name": "Superuser",
+    "password": "salainen"
+}
+
+### Crear otro usuario de ejemplo
+POST http://localhost:3001/api/users
+Content-Type: application/json
+
+{
+    "username": "tuusuario",
+    "name": "Tu Nombre Completo",
+    "password": "tupassword"
+}
+
+### Crear otro usuario de ejemplo 2
+POST http://localhost:3001/api/users
+Content-Type: application/json
+
+{
+    "username": "exampleuser",
+    "name": "Example User",
+    "password": "secretpassword"
+}
+
+### Crear usuario mluukkai
+post http://localhost:3001/api/users
+Content-Type: application/json
+
+{
+    "username": "mluukkai",
+    "password": "salainen"
+}
+
+### Crear un usuario que cause un error de validación (ej. nombre de usuario muy corto o sin contraseña)
+# Esto fallará con un 400 Bad Request si tienes validación implementada.
+POST http://localhost:3001/api/users
+Content-Type: application/json
+
+{
+    "username": "a",
+    "name": "Short User",
+    "password": "p"
+}
+
+### Ver todos los usuarios (si tienes implementado un endpoint GET para usuarios)
+# Esto es opcional y solo funcionará si ya implementaste esta ruta.
+GET http://localhost:3001/api/users
+Content-Type: application/json
